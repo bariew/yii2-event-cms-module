@@ -5,37 +5,74 @@ namespace bariew\eventModule\components;
 use bariew\eventModule\helpers\ClassCrawler;
 use bariew\nodeTree\ARTreeMenuWidget;
 use yii\base\Behavior;
+use yii\db\ActiveRecord;
 
 class TreeBehavior extends Behavior
 {
-    public function treeWidget($callback)
+    public function events()
     {
-        $cacheKey = get_class($this) . '__' . $callback;
-        //if (!\Yii::$app->cache->exists($cacheKey)) {
-//            \Yii::$app->set($cacheKey, ARTreeMenuWidget::widget([
-//                'view'  => 'simple',
-//                'items' => $this->$callback(),
-//                'id'    => $callback,
-//                'options'   => [
-//                    'plugins' => ["search", "types"]
-//                ],
-//                'binds'     => [
-//                    'select_node.jstree'  => 'function(event, data){return false;}',
-//                ]
-//            ]));
-        //}
-        //return \Yii::$app->cache->get($cacheKey);
-        return ARTreeMenuWidget::widget([
-                'view'  => 'simple',
-                'items' => $this->$callback(),
-                'id'    => $callback,
-                'options'   => [
-                    'plugins' => ["search", "types"]
-                ],
-                'binds'     => [
-                    'select_node.jstree'  => 'function(event, data){return false;}',
-                ]
-            ]);
+        return [
+            ActiveRecord::EVENT_AFTER_INSERT    => 'updateAppEventTree',
+            ActiveRecord::EVENT_AFTER_UPDATE    => 'updateAppEventTree',
+            ActiveRecord::EVENT_AFTER_DELETE    => 'updateAppEventTree',
+        ];
+    }
+
+    public function updateAppEventTree()
+    {
+        $this->treeWidget('appEventTree', true);
+    }
+
+    public function treeWidget($callback, $force = false)
+    {
+        $cacheKey = $this->getCacheKey($callback);
+        $options = [
+            'view'  => 'simple',
+            'items' => $this->$callback(),//$this->getCached($callback),
+            'id'    => $callback,
+            'options'   => [
+                'plugins' => ["search", "types", 'state']
+            ],
+            'binds'     => [
+                'select_node.jstree'  => 'function(event, data){
+                    var el = $(data.event.currentTarget);
+                    if (data.node.children_d.length) {
+                        return alert("Can not select parent node!");
+                    }
+                    var className = [];
+                    var container = $("#'.$callback.'");
+                    el.parents("#'.$callback.' ul li").each(function(){
+                        className.unshift($(this).find("a").eq(0).text().replace(/\s/, ""));
+                    });
+                    var methodName = className.pop();
+                    className = className.join(\'\\\\\');
+                    container.parent().find("input.owner").val(className);
+                    container.parent().find("input.method").val(methodName);
+                }',
+            ]
+        ];
+
+        if (!\Yii::$app->cache->exists($cacheKey) || $force) {
+            $data = ARTreeMenuWidget::widget($options);
+            \Yii::$app->cache->set($cacheKey, $data);
+        } else {
+            (new ARTreeMenuWidget($options))->registerScripts();
+        }
+        return \Yii::$app->cache->get($cacheKey);
+    }
+
+    protected function getCacheKey($name)
+    {
+        return  get_class($this) . '__' . $name;
+    }
+
+    protected function getCached($methodName)
+    {
+        $cacheKey = $this->getCacheKey($methodName);
+        if (!\Yii::$app->cache->exists($cacheKey)) {
+            \Yii::$app->cache->set($cacheKey, serialize($this->$methodName()));
+        }
+        return unserialize(\Yii::$app->cache->get($cacheKey));
     }
 
     public function classEventTree()
@@ -45,7 +82,7 @@ class TreeBehavior extends Behavior
             if (!$data = ClassCrawler::getEventNames($class)) {
                 continue;
             }
-            $items[$class] = $data;
+            $items[$class] = array_flip($data);
         }
         return $this->createSlashTree($items);
     }

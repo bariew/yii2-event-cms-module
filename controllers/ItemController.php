@@ -2,8 +2,6 @@
 
 namespace bariew\eventModule\controllers;
 
-use bariew\eventModule\helpers\ClassCrawler;
-use bariew\eventModule\widgets\CommonTree;
 use Yii;
 use bariew\eventModule\models\Item;
 use bariew\eventModule\models\ItemSearch;
@@ -18,6 +16,7 @@ use yii\web\Response;
  */
 class ItemController extends Controller
 {
+
     public function behaviors()
     {
         return [
@@ -67,7 +66,7 @@ class ItemController extends Controller
         $model = new Item();
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('create', [
                 'model' => $model,
@@ -86,7 +85,7 @@ class ItemController extends Controller
         $model = $this->findModel($id);
 
         if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+            return $this->redirect(['index']);
         } else {
             return $this->render('update', [
                 'model' => $model,
