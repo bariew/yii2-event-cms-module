@@ -13,6 +13,7 @@ class m140715_084936_event_item extends Migration
             'trigger_event'  => Schema::TYPE_STRING,
             'handler_class' => Schema::TYPE_STRING,
             'handler_method'=> Schema::TYPE_STRING,
+            'active'        => Schema::TYPE_SMALLINT,
         ]);
     }
 

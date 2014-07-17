@@ -27,6 +27,18 @@ $this->params['breadcrumbs'][] = $this->title;
             'trigger_event',
             'handler_class',
             'handler_method',
+            [
+                'attribute'=>'active',
+                'format'    => 'raw',
+                'value' => function($data) {
+                    return Html::activeCheckbox($data, 'active', [
+                        'data-link' => \yii\helpers\Url::toRoute(['activate', 'id'=>$data->id]),
+                        'onchange'  => 'var el = $(this); $.get(
+                            el.data("link")+"&active="+(el.is(":checked")*1)
+                        )'
+                    ]);
+                }
+            ],
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

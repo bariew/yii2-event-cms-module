@@ -94,6 +94,17 @@ class ItemController extends Controller
     }
 
     /**
+     * Activates/deactivates model.
+     * @param integer $id model id.
+     * @param integer 1/0 $active whether to activate model.
+     */
+    public function actionActivate($id, $active)
+    {
+        $model = Item::findOne($id);
+        $model->attributes = compact('active');
+        $model->save();
+    }
+    /**
      * Deletes an existing Item model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
@@ -104,6 +115,25 @@ class ItemController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionTree($type, $model_id, $id)
+    {
+        $model = $model_id ? Item::findOne($model_id) : new Item();
+        $tree = $model->$type();
+        ob_clean();
+        if ($id == '#') {
+            $id = false;
+            $items = $tree;
+        } else {
+            $path = explode('\\', $id);
+            $items = $tree;
+            foreach ($path as $name) {
+                $items = &$items[$name];
+            }
+        }
+        Yii::$app->response->format = Response::FORMAT_JSON;
+        return $model->createJsonTreeItems($type, $items, $id);
     }
 
     /**

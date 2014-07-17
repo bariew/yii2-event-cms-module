@@ -21,6 +21,7 @@ class ClassCrawler
             }
             $result[$name] = $value;
         }
+
         return $result;
     }
 
@@ -39,6 +40,7 @@ class ClassCrawler
             }
             $result[$method->name] = $method->name;
         }
+
         return $result;
     }
 
@@ -74,6 +76,7 @@ class ClassCrawler
                 $result[] = $className;
             }
         }
+
         return self::$_allClasses = $result;
     }
 

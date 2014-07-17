@@ -3,9 +3,11 @@
 namespace bariew\eventModule\components;
 
 use bariew\eventModule\helpers\ClassCrawler;
+use bariew\eventModule\models\Item;
 use bariew\nodeTree\ARTreeMenuWidget;
 use yii\base\Behavior;
 use yii\db\ActiveRecord;
+use yii\helpers\Url;
 
 class TreeBehavior extends Behavior
 {
@@ -18,47 +20,96 @@ class TreeBehavior extends Behavior
         ];
     }
 
+    public function moduleEventList()
+    {
+        $attributes = ['trigger_class', 'trigger_event', 'handler_class', 'handler_method'];
+        $order = array_combine($attributes, array_fill(0, count($attributes), SORT_ASC));
+        $allEvents = Item::find()->where(['active'=>1])->select($attributes)->orderBy($order)->asArray()->all();
+        $result = [];
+        foreach ($allEvents as $data) {
+            $result[$data['trigger_class']][$data['trigger_event']][] = [$data['handler_class'], $data['handler_method']];
+        }
+        return $result;
+    }
+
     public function updateAppEventTree()
     {
         $this->treeWidget('appEventTree', true);
+        $this->getCached('moduleEventList', true);
+    }
+
+    public function createJsonTreeItems($type, $items, $id)
+    {
+        $result = [];
+        $activeId = $this->getActiveNodeId($type);
+        foreach ((array) $items as $item => $data) {
+            $nodeId = ($id == false) ? $item : $id . "\\" . $item;
+            $result[] = [
+                "text" => $item,
+                "children" => is_array($data),
+                "id"    => $nodeId,
+                "type"  => "book",
+                "state" => [
+                    "opened"    => strpos($activeId, $nodeId) === 0,
+                    //"disabled"  =>
+                    "selected"  => $activeId == $nodeId
+                ],
+                'a_attr'=> [
+                    'data-id'   => $nodeId,
+                ],
+            ];
+        }
+        return $result;
+    }
+
+    public function getActiveNodeId($callback)
+    {
+        switch ($callback) {
+            case 'classEventTree' :
+                return implode('\\', [$this->owner->trigger_class, $this->owner->trigger_event]);
+            case 'classHandlerTree':
+                return implode('\\', [$this->owner->handler_class, $this->owner->handler_method]);
+        }
     }
 
     public function treeWidget($callback, $force = false)
     {
-        $cacheKey = $this->getCacheKey($callback);
         $options = [
             'view'  => 'simple',
+            'behavior'  => $this,
             'items' => $this->$callback(),//$this->getCached($callback),
             'id'    => $callback,
             'options'   => [
-                'plugins' => ["search", "types", 'state']
+                "core" => ($callback == 'classEventTree')
+                ? [
+                    "animation" => 0,
+                    "check_callback" => true,
+                    'data' => [
+                        'url' => Url::toRoute(['tree', 'type' => $callback, 'model_id' => $this->owner->id]),
+                        'data' => 'function(node) {return { "id" : node.id };}'
+                    ]
+                ]
+                : (new ARTreeMenuWidget())->commonOptions()['core'],
+                'plugins' => ["search", "types"]
             ],
             'binds'     => [
                 'select_node.jstree'  => 'function(event, data){
                     var el = $(data.event.currentTarget);
                     if (data.node.children_d.length) {
-                        return alert("Can not select parent node!");
+                        return jstree.jstree(true).deselect_node(data.node);
                     }
                     var className = [];
-                    var container = $("#'.$callback.'");
                     el.parents("#'.$callback.' ul li").each(function(){
                         className.unshift($(this).find("a").eq(0).text().replace(/\s/, ""));
                     });
                     var methodName = className.pop();
                     className = className.join(\'\\\\\');
-                    container.parent().find("input.owner").val(className);
-                    container.parent().find("input.method").val(methodName);
+                    $("input.owner.'.$callback.'").val(className);
+                    $("input.method.'.$callback.'").val(methodName);
                 }',
             ]
         ];
-
-        if (!\Yii::$app->cache->exists($cacheKey) || $force) {
-            $data = ARTreeMenuWidget::widget($options);
-            \Yii::$app->cache->set($cacheKey, $data);
-        } else {
-            (new ARTreeMenuWidget($options))->registerScripts();
-        }
-        return \Yii::$app->cache->get($cacheKey);
+        return ARTreeMenuWidget::widget($options);;
     }
 
     protected function getCacheKey($name)
@@ -66,10 +117,10 @@ class TreeBehavior extends Behavior
         return  get_class($this) . '__' . $name;
     }
 
-    protected function getCached($methodName)
+    public function getCached($methodName, $force = false)
     {
         $cacheKey = $this->getCacheKey($methodName);
-        if (!\Yii::$app->cache->exists($cacheKey)) {
+        if (!\Yii::$app->cache->exists($cacheKey) || $force) {
             \Yii::$app->cache->set($cacheKey, serialize($this->$methodName()));
         }
         return unserialize(\Yii::$app->cache->get($cacheKey));
@@ -133,5 +184,28 @@ class TreeBehavior extends Behavior
             }
         }
         return $result;
+    }
+
+
+    /* lists for old from dropdowns */
+
+    public static function classList()
+    {
+        $classes = ClassCrawler::getAllClasses();
+        return array_combine($classes, $classes);
+    }
+
+    public static function eventList($className)
+    {
+        return ($className)
+            ? array_flip(ClassCrawler::getEventNames($className))
+            : [];
+    }
+
+    public static function methodList($className)
+    {
+        return ($className)
+            ? array_flip(ClassCrawler::getEventHandlerMethodNames($className))
+            : [];
     }
 }

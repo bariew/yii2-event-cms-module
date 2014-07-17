@@ -16,27 +16,26 @@ use kartik\widgets\Select2;
 <div class="event-edit-form">
 
     <?php $form = ActiveForm::begin(); ?>
+    <?php echo $form->errorSummary($model) ;?>
+        <?php echo $form->field($model, 'trigger_class')->textInput(['class'=>'owner classEventTree']) ;?>
+        <?php echo $form->field($model, 'trigger_event')->textInput(['class'=>'method classEventTree']) ;?>
+        <?php echo $form->field($model, 'handler_class')->textInput(['class'=>'owner classHandlerTree']) ;?>
+        <?php echo $form->field($model, 'handler_method')->textInput(['class'=>'method classHandlerTree']) ;?>
+        <div class="row form-group">
+            <?php echo Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        </div>
+    <?php ActiveForm::end(); ?>
 
     <div class="row">
         <div class='col-sm-5 well'>
             <h4>Trigger</h4>
             <?php echo $model->treeWidget('classEventTree') ;?>
-            <?php echo $form->field($model, 'trigger_class')->textInput(['class'=>'owner']) ;?>
-            <?php echo $form->field($model, 'trigger_event')->textInput(['class'=>'method']) ;?>
         </div>
         <div class="col-sm-2 "></div>
         <div class='col-sm-5 well'>
             <h4>Handler</h4>
             <?php echo $model->treeWidget('classHandlerTree') ;?>
-            <?php echo $form->field($model, 'handler_class')->textInput(['class'=>'owner']) ;?>
-            <?php echo $form->field($model, 'handler_method')->textInput(['class'=>'method']) ;?>
         </div>
+        <div class="clearfix"></div></div>
     </div>
-
-
-    <div class="form-group">
-        <?php echo Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
-    </div>
-
-    <?php ActiveForm::end(); ?>
 </div>

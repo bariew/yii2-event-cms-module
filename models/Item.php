@@ -3,7 +3,6 @@
 namespace bariew\eventModule\models;
 
 use bariew\eventModule\components\TreeBehavior;
-use bariew\eventModule\helpers\ClassCrawler;
 use Yii;
 use \yii\db\ActiveRecord;
 
@@ -18,27 +17,6 @@ use \yii\db\ActiveRecord;
  */
 class Item extends ActiveRecord
 {
-
-    public static function classList()
-    {
-        $classes = ClassCrawler::getAllClasses();
-        return array_combine($classes, $classes);
-    }
-
-    public static function eventList($className)
-    {
-        return ($className)
-            ? array_flip(ClassCrawler::getEventNames($className))
-            : [];
-    }
-
-    public static function methodList($className)
-    {
-        return ($className)
-            ? array_flip(ClassCrawler::getEventHandlerMethodNames($className))
-            : [];
-    }
-
     /**
      * @inheritdoc
      */
@@ -54,7 +32,9 @@ class Item extends ActiveRecord
     {
         return [
             [['trigger_class', 'trigger_event', 'handler_class', 'handler_method'], 'string', 'max' => 255],
-            [['trigger_class', 'trigger_event', 'handler_class', 'handler_method'], 'required'],
+            [['trigger_class', 'trigger_event', 'handler_class', 'handler_method'], 'required', 'enableClientValidation'=>false],
+            [['active'], 'integer'],
+            [['active'], 'default', 'value' => 1]
         ];
     }
 
@@ -69,9 +49,13 @@ class Item extends ActiveRecord
             'trigger_event' => Yii::t('modules/event', 'Trigger Event'),
             'handler_class' => Yii::t('modules/event', 'Handler Class'),
             'handler_method' => Yii::t('modules/event', 'Handler Method'),
+            'active' => Yii::t('modules/event', 'Active'),
         ];
     }
 
+    /**
+     * @inheritdoc
+     */
     public function behaviors()
     {
         return [
