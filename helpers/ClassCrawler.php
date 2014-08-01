@@ -50,6 +50,9 @@ class ClassCrawler
         if (!$reflection = self::getReflection($className)) {
             return $result;
         }
+        if (!$reflection->hasMethod($methodName)) {
+            return $result;
+        }
         $method = $reflection->getMethod($methodName);
         $body = self::getReflectionBody($method);
         $events = array_flip(self::extractTriggeredEvents($body));
@@ -67,6 +70,9 @@ class ClassCrawler
         $result = [];
         foreach (self::getAllAliases() as $alias) {
             $path = Yii::getAlias($alias);
+            if (!file_exists($path) || is_file($path)) {
+                continue;
+            }
             $files = BaseFileHelper::findFiles($path, ['except' => ['/yii2-gii/']]);
             foreach ($files as $filePath) {
                 if (!preg_match('/.*\/[A-Z]\w+\.php/', $filePath)) {

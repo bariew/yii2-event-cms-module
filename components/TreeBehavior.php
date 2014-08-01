@@ -34,7 +34,6 @@ class TreeBehavior extends Behavior
 
     public function updateAppEventTree()
     {
-        $this->treeWidget('appEventTree', true);
         $this->getCached('moduleEventList', true);
     }
 
@@ -48,7 +47,7 @@ class TreeBehavior extends Behavior
                 "text" => $item,
                 "children" => is_array($data),
                 "id"    => $nodeId,
-                "type"  => "book",
+                "type"  => is_array($data) ? 'book' : 'file',
                 "state" => [
                     "opened"    => strpos($activeId, $nodeId) === 0,
                     //"disabled"  =>

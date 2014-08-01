@@ -17,12 +17,14 @@ use kartik\widgets\Select2;
 
     <?php $form = ActiveForm::begin(); ?>
     <?php echo $form->errorSummary($model) ;?>
-        <?php echo $form->field($model, 'trigger_class')->textInput(['class'=>'owner classEventTree']) ;?>
-        <?php echo $form->field($model, 'trigger_event')->textInput(['class'=>'method classEventTree']) ;?>
-        <?php echo $form->field($model, 'handler_class')->textInput(['class'=>'owner classHandlerTree']) ;?>
-        <?php echo $form->field($model, 'handler_method')->textInput(['class'=>'method classHandlerTree']) ;?>
+        <div class="hide">
+            <?php echo $form->field($model, 'trigger_class')->textInput(['class'=>'owner classEventTree']) ;?>
+            <?php echo $form->field($model, 'trigger_event')->textInput(['class'=>'method classEventTree']) ;?>
+            <?php echo $form->field($model, 'handler_class')->textInput(['class'=>'owner classHandlerTree']) ;?>
+            <?php echo $form->field($model, 'handler_method')->textInput(['class'=>'method classHandlerTree']) ;?>
+        </div>
         <div class="row form-group">
-            <?php echo Html::submitButton($model->isNewRecord ? Yii::t('app', 'Create') : Yii::t('app', 'Update'), ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+            <?php echo Html::submitButton(Yii::t('app', 'Save'), ['class' => 'btn btn-success pull-right']) ?>
         </div>
     <?php ActiveForm::end(); ?>
 

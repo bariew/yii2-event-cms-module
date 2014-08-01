@@ -1,7 +1,7 @@
 <?php
 Yii::setAlias('@bariew/eventModule', __DIR__.'/../');
 return [
-    'events'    =>  (new \bariew\eventModule\models\Item())->getCached('moduleEventList'),
+    'events'    =>  Yii::$app->has('db') ? (new \bariew\eventModule\models\Item())->moduleEventList() : [],
     'menu'  => [
         'label'    => 'Events',
         'url' => ['/event/item/index']

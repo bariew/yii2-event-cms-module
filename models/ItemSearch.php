@@ -46,7 +46,9 @@ class ItemSearch extends Item
         $dataProvider = new ActiveDataProvider([
             'query' => $query,
         ]);
-
+        $dataProvider->sort->defaultOrder = [
+            'trigger_class'=>SORT_ASC, 'trigger_event'=>SORT_ASC, 'handler_class'=>SORT_ASC, 'handler_method'=>SORT_ASC
+        ];
         if (!($this->load($params) && $this->validate())) {
             return $dataProvider;
         }

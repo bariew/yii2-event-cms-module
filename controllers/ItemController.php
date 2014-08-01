@@ -117,7 +117,7 @@ class ItemController extends Controller
         return $this->redirect(['index']);
     }
 
-    public function actionTree($type, $model_id, $id)
+    public function actionTree($type, $id, $model_id = false)
     {
         $model = $model_id ? Item::findOne($model_id) : new Item();
         $tree = $model->$type();
