@@ -12,11 +12,15 @@
     ],
     "require"   : {
         "bariew/yii2-node-tree" : "2.0.*",
-        "kartik-v/yii2-widgets": "dev-master"
+        "kartik-v/yii2-widgets": "dev-master",
+        "bariew/yii2-event-component" : "2.*"
     },
     "autoload": {
         "psr-4": {
             "bariew\\eventModule\\": ""
         }
-    }  
+    },
+    "extra": {
+        "bootstrap": "bariew\\eventModule\\EventBootstrap"
+    }
 }
