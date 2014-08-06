@@ -10,8 +10,8 @@ namespace bariew\eventModule;
 
 use yii\base\BootstrapInterface;
 use Yii;
-use yii\web\Application;
 use \bariew\eventModule\models\Item;
+use bariew\eventManager\EventBootstrap as EventManagerBootstrap;
 
 /**
  * Bootstrap class initiates config check.
@@ -29,37 +29,9 @@ class EventBootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        $events = Yii::$app->has('db') && isset(Yii::$app->db->schema->tableSchemas[Item::tableName()])
+        $events = Yii::$app->has('db') && in_array(Item::tableName(), Yii::$app->db->schema->tableNames)
             ? (new Item())->getCached('moduleEventList') : [];
-        self::getEventManager($app)->attachEvents($events);
+        EventManagerBootstrap::getEventManager($app)->attachEvents($events);
         return $this;
-    }
-    /**
-     * finds and creates app event manager from its settings
-     * @param Application $app yii app
-     * @return EventManager app event manager component
-     * @throws Exception Define event manager
-     */
-    public static function getEventManager($app)
-    {
-        if (self::$_eventManager) {
-            return self::$_eventManager;
-        }
-        foreach ($app->components as $name => $config) {
-            $class = is_string($config) ? $config : @$config['class'];
-            if($class == str_replace('Bootstrap', 'Manager', get_called_class())){
-                return self::$_eventManager = $app->$name;
-            }
-        }
-        $eventFile = \Yii::getAlias('@app/config/_events.php');
-        $app->setComponents([
-            'eventManager' => [
-                'class'  => 'bariew\eventManager\EventManager',
-                'events' => file_exists($eventFile) && is_file($eventFile)
-                        ? include $eventFile
-                        : []
-            ],
-        ]);
-        return self::$_eventManager = $app->eventManager;
     }
 }

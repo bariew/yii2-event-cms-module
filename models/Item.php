@@ -14,9 +14,15 @@ use \yii\db\ActiveRecord;
  * @property string $trigger_event
  * @property string $handler_class
  * @property string $handler_method
+ *
+ * @method TreeBehavior getCached() TreeBehavior::getCached()
  */
 class Item extends ActiveRecord
 {
+    public static function eventTest($event)
+    {
+        print_r($event); exit;
+    }
     /**
      * @inheritdoc
      */
