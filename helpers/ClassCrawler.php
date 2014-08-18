@@ -107,8 +107,9 @@ class ClassCrawler
             if (in_array($shortName, ['YiiRequirementChecker'])) {
                 return false;
             }
-            if (class_exists($shortName)) {
-                $className = $shortName;
+            if (class_exists($shortName,false)) {
+                //print_r(get_declared_classes());exit;
+                return false;
             }
             $reflection = new \ReflectionClass($className);
         } catch (\Exception $e) {
