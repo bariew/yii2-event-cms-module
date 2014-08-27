@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use Yii;
 
 /* @var $this yii\web\View */
 /* @var $model bariew\eventModule\models\Item */

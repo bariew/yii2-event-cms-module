@@ -29,7 +29,7 @@ class EventBootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
-        $events = Yii::$app->has('db') && in_array(Item::tableName(), Yii::$app->db->schema->tableNames)
+        $events = Yii::$app->has('db') && Yii::$app->db->getTableSchema(Item::tableName())
             ? (new Item())->getCached('moduleEventList') : [];
         EventManagerBootstrap::getEventManager($app)->attachEvents($events);
         return $this;

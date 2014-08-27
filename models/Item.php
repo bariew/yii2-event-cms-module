@@ -28,7 +28,7 @@ class Item extends ActiveRecord
      */
     public static function tableName()
     {
-        return 'event_item';
+        return '{{event_item}}';
     }
 
     /**

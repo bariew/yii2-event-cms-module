@@ -2,10 +2,8 @@
 
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
-use yii\widgets\DetailView;
-use kartik\widgets\DepDrop;
-use yii\helpers\Url;
-use kartik\widgets\Select2;
+use Yii;
+
 /**
  * @var yii\web\View $this
  * @var bariew\eventModule\models\Item $model
@@ -30,12 +28,12 @@ use kartik\widgets\Select2;
 
     <div class="row">
         <div class='col-sm-5 well'>
-            <h4>Trigger</h4>
+            <h4><?= Yii::t('modules/event', 'Trigger'); ?></h4>
             <?php echo $model->treeWidget('classEventTree') ;?>
         </div>
         <div class="col-sm-2 "></div>
         <div class='col-sm-5 well'>
-            <h4>Handler</h4>
+            <h4><?= Yii::t('modules/event', 'Handler'); ?></h4>
             <?php echo $model->treeWidget('classHandlerTree') ;?>
         </div>
         <div class="clearfix"></div></div>
