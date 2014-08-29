@@ -19,10 +19,6 @@ use \yii\db\ActiveRecord;
  */
 class Item extends ActiveRecord
 {
-    public static function eventTest($event)
-    {
-        print_r($event); exit;
-    }
     /**
      * @inheritdoc
      */

@@ -5,7 +5,6 @@ namespace bariew\eventModule\models;
 use Yii;
 use yii\base\Model;
 use yii\data\ActiveDataProvider;
-use bariew\eventModule\models\Item;
 
 /**
  * ItemSearch represents the model behind the search form about `bariew\eventModule\models\Item`.
