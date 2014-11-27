@@ -2,7 +2,6 @@
 
 use yii\helpers\Html;
 use yii\widgets\DetailView;
-use Yii;
 
 /* @var $this yii\web\View */
 /* @var $model bariew\eventModule\models\Item */

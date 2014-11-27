@@ -5,7 +5,6 @@ use yii\widgets\ActiveForm;
 use kartik\widgets\DepDrop;
 use yii\helpers\Url;
 use kartik\widgets\Select2;
-use Yii;
 
 /**
  * @var yii\web\View $this
