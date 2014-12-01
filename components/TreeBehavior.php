@@ -34,7 +34,7 @@ class TreeBehavior extends Behavior
 
     public function updateAppEventTree()
     {
-        $this->getCached('moduleEventList', true);
+        $this->moduleEventList();
     }
 
     public function createJsonTreeItems($type, $items, $id)
@@ -76,7 +76,7 @@ class TreeBehavior extends Behavior
         $options = [
             'view'  => 'simple',
             'behavior'  => $this,
-            'items' => $this->$callback(),//$this->getCached($callback),
+            'items' => $this->$callback(),
             'id'    => $callback,
             'options'   => [
                 "core" => ($callback == 'classEventTree')
@@ -114,15 +114,6 @@ class TreeBehavior extends Behavior
     protected function getCacheKey($name)
     {
         return  get_class($this) . '__' . $name;
-    }
-
-    public function getCached($methodName, $force = false)
-    {
-        $cacheKey = $this->getCacheKey($methodName);
-        if (!\Yii::$app->cache->exists($cacheKey) || $force) {
-            \Yii::$app->cache->set($cacheKey, serialize($this->$methodName()));
-        }
-        return unserialize(\Yii::$app->cache->get($cacheKey));
     }
 
     public function classEventTree()
