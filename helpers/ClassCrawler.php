@@ -12,15 +12,20 @@ class ClassCrawler
     public static function getEventNames($className)
     {
         $result = [];
-        if (!$reflection = self::getReflection($className)) {
-            return $result;
-        }
-        foreach ($reflection->getConstants() as $name => $value) {
-            if (!preg_match('/^EVENT/', $name)) {
-                continue;
+        try {
+            if (!$reflection = self::getReflection($className)) {
+                return $result;
             }
-            $result[$name] = $value;
+            foreach ($reflection->getConstants() as $name => $value) {
+                if (!preg_match('/^EVENT/', $name)) {
+                    continue;
+                }
+                $result[$name] = $value;
+            }
+        } catch (\Exception $e) {
+            echo $className;exit;
         }
+
 
         return $result;
     }
@@ -73,7 +78,7 @@ class ClassCrawler
             if (!file_exists($path) || is_file($path)) {
                 continue;
             }
-            $files = BaseFileHelper::findFiles($path, ['except' => ['/yii2-gii/']]);
+            $files = BaseFileHelper::findFiles($path, ['except' => ['/yii2-gii/', 'Yii.php']]);
             foreach ($files as $filePath) {
                 if (!preg_match('/.*\/[A-Z]\w+\.php/', $filePath)) {
                     continue;
@@ -103,12 +108,7 @@ class ClassCrawler
     protected static function getReflection($className)
     {
         try {
-            $shortName =  preg_replace('/.*\\\(\w+)$/', '$1', $className);
-            if (in_array($shortName, ['YiiRequirementChecker'])) {
-                return false;
-            }
-            if (class_exists($shortName,false)) {
-                //print_r(get_declared_classes());exit;
+            if (in_array($className, ['yii\requirements\YiiRequirementChecker', 'yii\helpers\Markdown'])) {
                 return false;
             }
             $reflection = new \ReflectionClass($className);
