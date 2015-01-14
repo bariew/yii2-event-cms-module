@@ -7,7 +7,6 @@
 
 namespace bariew\eventModule;
 
-
 use yii\base\BootstrapInterface;
 use Yii;
 use \bariew\eventModule\models\Item;
@@ -29,6 +28,9 @@ class EventBootstrap implements BootstrapInterface
      */
     public function bootstrap($app)
     {
+        if (!Module::isEnabled()) {
+            return true;
+        }
         $events = (Yii::$app->db->getTableSchema(Item::tableName()))
             ? (new Item())->moduleEventList() : [];
         EventManagerBootstrap::getEventManager($app)->attachEvents($events);
