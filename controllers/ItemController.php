@@ -119,9 +119,9 @@ class ItemController extends Controller
 
     public function actionTree($type, $id, $model_id = false)
     {
+        ob_start();
         $model = $model_id ? Item::findOne($model_id) : new Item();
         $tree = $model->$type();
-        ob_clean();
         if ($id == '#') {
             $id = false;
             $items = $tree;
@@ -132,6 +132,7 @@ class ItemController extends Controller
                 $items = &$items[$name];
             }
         }
+        ob_clean();
         Yii::$app->response->format = Response::FORMAT_JSON;
         return $model->createJsonTreeItems($type, $items, $id);
     }

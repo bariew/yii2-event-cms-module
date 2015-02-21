@@ -108,7 +108,7 @@ class TreeBehavior extends Behavior
                 }',
             ]
         ];
-        return ARTreeMenuWidget::widget($options);;
+        return ARTreeMenuWidget::widget($options);
     }
 
     protected function getCacheKey($name)
