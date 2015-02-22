@@ -6,8 +6,11 @@ class Module extends \yii\base\Module
 {
     public $params = [
         'menu'  => [
-            'label'    => 'Events',
-            'url' => ['/event/item/index']
+            'label' => 'Settings',
+            'items' => [[
+                'label'    => 'Events',
+                'url' => ['/event/item/index']
+            ]]
         ]
     ];
 
